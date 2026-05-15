@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <!-- Decorative geometric border -->
+  <rect x="1" y="1" width="198" height="58" rx="4" stroke="#C9A96E" stroke-width="1.5" fill="none"/>
+  <!-- Star/diamond motif left -->
+  <path d="M20 30 L26 22 L32 30 L26 38 Z" fill="#C9A96E" opacity="0.7"/>
+  <path d="M20 30 L26 24 L32 30 L26 36 Z" fill="none" stroke="#C9A96E" stroke-width="0.5"/>
+  <!-- Text -->
+  <text x="100" y="36" font-family="Georgia, serif" font-size="22" font-weight="bold" fill="#F5E6D3" text-anchor="middle" letter-spacing="3">SHAREEFS</text>
+  <!-- Star/diamond motif right -->
+  <path d="M168 30 L174 22 L180 30 L174 38 Z" fill="#C9A96E" opacity="0.7"/>
+  <path d="M168 30 L174 24 L180 30 L174 36 Z" fill="none" stroke="#C9A96E" stroke-width="0.5"/>
+</svg>
