@@ -21,7 +21,6 @@ export function DiceArea({ onRoll, onPlaySound }: DiceAreaProps) {
   const currentPlayer = gameState?.currentPlayer
   const canRoll = phase === 'rolling' && currentPlayer === 'white' && !aiThinking
 
-  // Reset rolling state after animation
   useEffect(() => {
     if (rolling) {
       const t = setTimeout(() => setRolling(false), 550)
@@ -40,82 +39,63 @@ export function DiceArea({ onRoll, onPlaySound }: DiceAreaProps) {
 
   if (!dice) return null
 
-  // Which dice have been used (remaining vs total)
   const allDice: DieValue[] = dice.rolled
     ? (dice.values[0] === dice.values[1]
         ? [dice.values[0], dice.values[0], dice.values[0], dice.values[0]]
         : [dice.values[0], dice.values[1]])
     : []
 
-  // Mark spent: count remaining vs all
   const remaining = [...dice.remaining]
   const spentFlags = allDice.map((d) => {
     const idx = remaining.indexOf(d)
-    if (idx !== -1) {
-      remaining.splice(idx, 1)
-      return false // still available
-    }
-    return true // spent
+    if (idx !== -1) { remaining.splice(idx, 1); return false }
+    return true
   })
 
   return (
-    <div className="flex flex-col items-center gap-3 py-2">
-      {/* Dice display — fixed height container prevents layout shift */}
-      <div className="flex items-center justify-center gap-3 h-16">
-        <AnimatePresence mode="wait">
-          {dice.rolled ? (
-            <motion.div
-              key="dice"
-              className="flex gap-3"
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              {allDice.map((val, i) => (
-                <Die
-                  key={i}
-                  value={val}
-                  spent={spentFlags[i]}
-                  rolling={rolling && !spentFlags[i]}
-                  size={52}
-                />
-              ))}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="placeholder"
-              className="flex gap-3"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              {[0, 1].map((i) => (
-                <div
-                  key={i}
-                  className="w-[52px] h-[52px] rounded-xl border-2 border-dashed border-brand-gold/30"
-                />
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Roll button */}
-      {canRoll && (
-        <motion.button
-          onClick={handleRoll}
-          whileTap={{ scale: 0.95 }}
-          className="px-8 py-3 rounded-full font-semibold text-brand-cream tracking-wide
-                     bg-brand-red hover:bg-brand-red-dark active:bg-brand-red-dark
-                     shadow-lg shadow-black/40 transition-colors text-sm uppercase"
-        >
-          Roll Dice
-        </motion.button>
-      )}
+    <div className="flex items-center justify-between px-4 py-2 gap-3">
+      {/* Dice display */}
+      <AnimatePresence mode="wait">
+        {dice.rolled ? (
+          <motion.div
+            key="dice"
+            className="flex gap-2 items-center"
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          >
+            {allDice.map((val, i) => (
+              <Die
+                key={i}
+                value={val}
+                spent={spentFlags[i]}
+                rolling={rolling && !spentFlags[i]}
+                size={44}
+              />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="placeholder"
+            className="flex gap-2 items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {[0, 1].map((i) => (
+              <div
+                key={i}
+                className="rounded-xl border-2 border-dashed border-brand-gold/30"
+                style={{ width: 44, height: 44 }}
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* AI thinking indicator */}
       {aiThinking && (
         <motion.div
-          className="flex items-center gap-2 text-brand-gold/70 text-xs"
+          className="flex items-center gap-1.5 text-brand-gold/70 text-xs"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
@@ -129,8 +109,21 @@ export function DiceArea({ onRoll, onPlaySound }: DiceAreaProps) {
               />
             ))}
           </span>
-          Opponent thinking…
+          Thinking…
         </motion.div>
+      )}
+
+      {/* Roll button */}
+      {canRoll && (
+        <motion.button
+          onClick={handleRoll}
+          whileTap={{ scale: 0.95 }}
+          className="px-6 py-2.5 rounded-full font-semibold text-brand-cream tracking-wide
+                     bg-brand-red hover:bg-brand-red-dark active:bg-brand-red-dark
+                     shadow-lg shadow-black/40 transition-colors text-sm uppercase"
+        >
+          Roll
+        </motion.button>
       )}
     </div>
   )

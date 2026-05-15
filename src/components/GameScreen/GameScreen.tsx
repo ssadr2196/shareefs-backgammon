@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Board } from '../Board/Board'
 import { DiceArea } from '../Dice/DiceArea'
@@ -12,6 +12,17 @@ export function GameScreen() {
   const [showHowTo, setShowHowTo] = useState(false)
   const [confirmResign, setConfirmResign] = useState(false)
   const playSound = useSound(soundEnabled)
+
+  // Measure the board section height so Board can scale checkers to fill it
+  const boardSectionRef = useRef<HTMLDivElement>(null)
+  const [boardSectionH, setBoardSectionH] = useState(400)
+  useEffect(() => {
+    const el = boardSectionRef.current
+    if (!el) return
+    const obs = new ResizeObserver(([entry]) => setBoardSectionH(Math.floor(entry.contentRect.height)))
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
 
   if (!gameState) return null
 
@@ -32,7 +43,7 @@ export function GameScreen() {
 
   return (
     <div
-      className="min-h-svh flex flex-col"
+      className="h-svh overflow-hidden flex flex-col"
       style={{ background: 'linear-gradient(160deg, #1A1A1A 0%, #0e0805 60%, #1a0e06 100%)' }}
     >
       {/* Top bar */}
@@ -96,8 +107,8 @@ export function GameScreen() {
       </motion.div>
 
       {/* Board */}
-      <div className="flex-1 flex flex-col items-center justify-center py-2 overflow-hidden">
-        <Board onPlaySound={playSound} />
+      <div ref={boardSectionRef} className="flex-1 min-h-0 flex flex-col items-center justify-center px-2 py-1 overflow-hidden">
+        <Board onPlaySound={playSound} availableHeight={boardSectionH} />
       </div>
 
       {/* Dice area */}

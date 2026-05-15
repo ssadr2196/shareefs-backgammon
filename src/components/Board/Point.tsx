@@ -10,6 +10,9 @@ interface PointProps {
   isSelected: boolean
   isValidDest: boolean
   isSelectable: boolean
+  pointWidth: number   // computed from board width
+  checkerSize: number  // computed from board width
+  halfHeight: number   // computed from board width
   onSelect: () => void
   onMoveTo: () => void
 }
@@ -24,19 +27,20 @@ export function Point({
   isSelected,
   isValidDest,
   isSelectable,
+  pointWidth,
+  checkerSize,
+  halfHeight,
   onSelect,
   onMoveTo,
 }: PointProps) {
-  const isLight = index % 2 === 0 // alternating colors
+  const isLight = index % 2 === 0
   const pointColor = isLight ? '#C9A96E' : '#8B1A1A'
-  const checkerSize = 30
 
   const handleClick = () => {
     if (isValidDest) onMoveTo()
     else if (isSelectable || isSelected) onSelect()
   }
 
-  // Stack: show up to MAX_VISIBLE checkers, badge shows real count
   const displayCount = Math.min(count, MAX_VISIBLE)
   const checkers = player && count > 0
     ? Array.from({ length: displayCount }, (_, i) => i)
@@ -49,35 +53,38 @@ export function Point({
       aria-label={`Point ${index}${count > 0 && player ? `, ${count} ${player}` : ', empty'}`}
       onClick={handleClick}
       onKeyDown={e => e.key === 'Enter' && handleClick()}
-      className="relative flex flex-col items-center cursor-pointer select-none"
-      style={{ width: checkerSize + 8, minHeight: 160 }}
+      className="relative flex flex-col items-center cursor-pointer select-none flex-shrink-0"
+      style={{ width: pointWidth, height: halfHeight }}
     >
-      {/* Triangle spike */}
+      {/* Triangle spike — SVG fills the container */}
       <svg
-        viewBox="0 0 38 160"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
         className="absolute inset-0 w-full h-full"
         style={{ zIndex: 0 }}
         aria-hidden="true"
       >
         <polygon
-          points={isTop ? '19,8 2,152 36,152' : '2,8 36,8 19,152'}
+          points={isTop ? '50,6 4,96 96,96' : '4,4 96,4 50,94'}
           fill={pointColor}
           opacity={isSelected ? 0.5 : isValidDest ? 0.3 : 0.85}
         />
-        {/* Point number */}
-        <text
-          x="19"
-          y={isTop ? 155 : 5}
-          textAnchor="middle"
-          dominantBaseline={isTop ? 'auto' : 'hanging'}
-          fontSize="8"
-          fill="#f5e6d3"
-          opacity="0.5"
-          fontFamily="Inter, sans-serif"
-        >
-          {index}
-        </text>
       </svg>
+
+      {/* Point number label */}
+      <div
+        className="absolute w-full flex justify-center"
+        style={{
+          [isTop ? 'bottom' : 'top']: 1,
+          fontSize: Math.max(7, Math.min(10, checkerSize * 0.33)),
+          color: 'rgba(245,230,211,0.45)',
+          zIndex: 1,
+          lineHeight: 1,
+          pointerEvents: 'none',
+        }}
+      >
+        {index}
+      </div>
 
       {/* Valid destination highlight */}
       {isValidDest && (
@@ -95,8 +102,10 @@ export function Point({
 
       {/* Checkers */}
       <div
-        className={`relative flex flex-col items-center gap-[2px] z-10 ${isTop ? 'pt-2' : 'pb-2 justify-end flex-col-reverse'}`}
-        style={{ flex: 1, width: '100%', paddingLeft: 4, paddingRight: 4 }}
+        className={`relative flex flex-col items-center z-10 ${
+          isTop ? 'pt-1' : 'pb-1 justify-end flex-col-reverse'
+        }`}
+        style={{ flex: 1, width: '100%', gap: 1 }}
       >
         {checkers.map((_, i) => (
           <CheckerPiece
